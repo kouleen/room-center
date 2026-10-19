@@ -23,6 +23,7 @@ services:
       - MYSQL_SLAVE2_HOST=${MYSQL_SLAVE2_HOST}
       - MYSQL_SLAVE2_PORT=${MYSQL_SLAVE2_PORT}
       - MYSQL_SLAVE2_DATABASE=${MYSQL_SLAVE2_DATABASE}
+      - RABBITMQ_URL=${RABBITMQ_URL}
     networks:
       - etcd-internal
       - mysql-internal
