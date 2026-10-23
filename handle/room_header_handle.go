@@ -20,13 +20,13 @@ func QueryHeader(ctx context.Context, req *room.RoomHeaderRequest) (resp *room.R
 }
 
 func CreateHeader(ctx context.Context, req *room.RoomHeaderRequest) (resp bool, err error) {
-	return
+	return service.CreateHeader(ctx, req)
 }
 
 func UpdateHeader(ctx context.Context, req *room.RoomHeaderRequest) (resp bool, err error) {
-	return
+	return service.UpdateHeader(ctx, req)
 }
 
 func DeleteHeader(ctx context.Context, req *room.RoomHeaderRequest) (resp bool, err error) {
-	return
+	return service.DeleteHeader(ctx, req)
 }

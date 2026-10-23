@@ -76,3 +76,11 @@ func QueryHeaderById(ctx context.Context, id int64) (resp *modle.RoomHeader, err
 	}
 	return
 }
+
+func CreateHeader(ctx context.Context, entity *modle.RoomHeader) error {
+	return mysql.GetWriteMysqlDDB().WithContext(ctx).Create(entity).Error
+}
+
+func UpdateHeader(ctx context.Context, entity *modle.RoomHeader) error {
+	return mysql.GetWriteMysqlDDB().WithContext(ctx).Save(entity).Error
+}

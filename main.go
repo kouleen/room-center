@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	bootstrap.Run(rpc.ROOT_RPC_SERVER, func(option ...server.Option) server.Server {
+	bootstrap.Run(rpc.ROOM_RPC_SERVER, func(option ...server.Option) server.Server {
 		return roomservice.NewServer(new(RoomServiceImpl), option...)
 	}, bootstrap.WithServerMiddleware(middleware.RpcServerMiddleware))
 }

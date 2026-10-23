@@ -2,8 +2,15 @@ package service
 
 import (
 	"context"
+	"errors"
 
+	"github.com/bwmarrin/snowflake"
+	"github.com/kouleen/common/pkg/alloc"
+	"github.com/kouleen/common/pkg/ctxutil"
+	"github.com/kouleen/idl/kitex_gen/common"
 	"github.com/kouleen/idl/kitex_gen/room"
+	"github.com/kouleen/idl/kitex_gen/rpc"
+	"github.com/kouleen/room-center/modle"
 	"github.com/kouleen/room-center/repository"
 )
 
@@ -40,4 +47,71 @@ func QueryHeader(ctx context.Context, req *room.RoomHeaderRequest) (resp *room.R
 		return
 	}
 	return item.ConvertResp(), err
+}
+
+func CreateHeader(ctx context.Context, req *room.RoomHeaderRequest) (resp bool, err error) {
+	segmentAlloc, err := alloc.NewSegmentAlloc(ctx, rpc.ROOM_RPC_SERVER)
+	if err != nil {
+		return
+	}
+	obfuscate, err := segmentAlloc.NextObfuscate(ctx)
+	if err != nil {
+		return
+	}
+	node, err := snowflake.NewNode(1)
+	if err != nil {
+		return false, err
+	}
+	id := node.Generate().Int64()
+	entity := &modle.RoomHeader{
+		ID:         id,
+		RoomNumber: obfuscate,
+		RoomName:   req.GetRoomName(),
+		RoomType:   req.RoomType,
+		RoomImage:  req.GetRoomImage(),
+		Background: req.GetBackground(),
+		CreatedBy:  ctxutil.GetUserId(ctx),
+	}
+	if err = repository.CreateHeader(ctx, entity); err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func UpdateHeader(ctx context.Context, req *room.RoomHeaderRequest) (resp bool, err error) {
+	item, err := repository.QueryHeaderById(ctx, req.GetId())
+	if err != nil {
+		return
+	}
+	item.RoomName = req.GetRoomName()
+	item.RoomType = req.RoomType
+	item.RoomImage = req.GetRoomImage()
+	item.Background = req.GetBackground()
+	item.Status = req.Status
+	item.Open = req.Open
+	item.UpdatedBy = ctxutil.GetUserId(ctx)
+	if err = repository.UpdateHeader(ctx, item); err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func DeleteHeader(ctx context.Context, req *room.RoomHeaderRequest) (resp bool, err error) {
+	item, err := repository.QueryHeaderById(ctx, req.GetId())
+	if err != nil {
+		return
+	}
+	if common.BaseStatus_ENABLE == common.BaseStatus(*item.Status) {
+		return false, errors.New("deleting an enable room is prohibited")
+	}
+	if common.BaseStatus_ENABLE == common.BaseStatus(*item.Open) {
+		return false, errors.New("deleting an open room is prohibited")
+	}
+	isDelete := int8(common.BaseStatus_ENABLE)
+	item.IsDelete = &isDelete
+	item.UpdatedBy = ctxutil.GetUserId(ctx)
+	if err = repository.UpdateHeader(ctx, item); err != nil {
+		return false, err
+	}
+	return true, nil
 }
