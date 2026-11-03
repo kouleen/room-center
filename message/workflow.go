@@ -4,7 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"strconv"
 
+	"github.com/bytedance/gopkg/util/logger"
+	"github.com/google/uuid"
 	"github.com/kouleen/common/message"
 	"github.com/kouleen/common/pkg/ctxutil"
 	"github.com/kouleen/common/pkg/logutil"
@@ -41,6 +44,21 @@ func (WorkflowReview) HandleMessage(ctx context.Context, msg *message.Message) e
 		Status: &status,
 	}); err != nil {
 		logutil.CtxError(ctx, "review header err: %#v", err)
+		req.Remark = err.Error()
+		messageByte, errMarshal := json.Marshal(&req)
+		if errMarshal != nil {
+			logger.CtxErrorf(ctx, "errMarshal: %v", errMarshal)
+			return nil
+		}
+		if msgErr := message.SendToQueue(context.Background(), "workflow.flow.fail.queue", &message.Message{
+			TraceID:     ctxutil.GetTraceId(ctx),
+			MessageID:   strconv.Itoa(int(uuid.New().ID())),
+			ContentType: "application/json",
+			Body:        messageByte,
+			Headers:     make(map[string]any),
+		}); msgErr != nil {
+			logger.CtxErrorf(ctx, "send workflow review fail error: %v", err)
+		}
 	}
 	return nil
 }
