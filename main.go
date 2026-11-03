@@ -6,6 +6,7 @@ import (
 	"github.com/kouleen/common/middleware"
 	"github.com/kouleen/idl/kitex_gen/room/roomservice"
 	"github.com/kouleen/idl/kitex_gen/rpc"
+	_ "github.com/kouleen/room-center/message"
 )
 
 func main() {

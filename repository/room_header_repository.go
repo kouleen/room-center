@@ -71,7 +71,21 @@ func QueryHeaderList(ctx context.Context, req *room.RoomHeaderRequest) (resp []*
 }
 
 func QueryHeaderById(ctx context.Context, id int64) (resp *modle.RoomHeader, err error) {
-	if err = mysql.GetReadMysqlDDB().WithContext(ctx).Model(&modle.RoomHeader{}).First(&resp, id).Error; err != nil {
+	if err = mysql.GetReadMysqlDDB().WithContext(ctx).Model(&modle.RoomHeader{}).Take(&resp, id).Error; err != nil {
+		return nil, err
+	}
+	return
+}
+
+func QueryHeaderByIdList(ctx context.Context, idList []int64) (resp []*modle.RoomHeader, err error) {
+	if err = mysql.GetReadMysqlDDB().WithContext(ctx).Model(&modle.RoomHeader{}).Where("id in (?)", idList).Find(&resp).Error; err != nil {
+		return nil, err
+	}
+	return
+}
+
+func QueryHeaderByFlowNo(ctx context.Context, flowNo string) (resp *modle.RoomHeader, err error) {
+	if err = mysql.GetReadMysqlDDB().WithContext(ctx).Model(&modle.RoomHeader{}).Where("flow_no = ?", flowNo).Take(&resp).Error; err != nil {
 		return nil, err
 	}
 	return
@@ -83,4 +97,15 @@ func CreateHeader(ctx context.Context, entity *modle.RoomHeader) error {
 
 func UpdateHeader(ctx context.Context, entity *modle.RoomHeader) error {
 	return mysql.GetWriteMysqlDDB().WithContext(ctx).Save(entity).Error
+}
+
+func BatchUpdateHeader(ctx context.Context, entityList []*modle.RoomHeader) (err error) {
+	return mysql.GetWriteMysqlDDB().WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		for _, header := range entityList {
+			if err = tx.Model(&modle.RoomHeader{}).Where("id = ?", header.ID).Save(header).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }

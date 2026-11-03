@@ -30,6 +30,11 @@ func (s *RoomServiceImpl) CreateRoomHeader(ctx context.Context, req *room.RoomHe
 	return handle.CreateHeader(ctx, req)
 }
 
+// CommitRoomHeader implements the RoomServiceImpl interface.
+func (s *RoomServiceImpl) CommitRoomHeader(ctx context.Context, req *room.RoomHeaderRequest) (resp bool, err error) {
+	return handle.CommitHeader(ctx, req)
+}
+
 // UpdateRoomHeader implements the RoomServiceImpl interface.
 func (s *RoomServiceImpl) UpdateRoomHeader(ctx context.Context, req *room.RoomHeaderRequest) (resp bool, err error) {
 	return handle.UpdateHeader(ctx, req)

@@ -6,6 +6,14 @@ import (
 	"github.com/kouleen/idl/kitex_gen/room"
 )
 
+const (
+	PREPARE  int8 = iota // 待提交
+	REVIEW               // 审批中
+	APPROVED             // 已审批
+	REJECTED             // 被驳回
+	CLOSED               // 已关闭
+)
+
 type RoomHeader struct {
 	ID         int64      `json:"id,string" gorm:"column:id;primary_key;not null"`
 	RoomNumber int64      `json:"roomNumber" gorm:"column:room_number;not null;default:0"`
@@ -15,6 +23,8 @@ type RoomHeader struct {
 	Background string     `json:"background" gorm:"column:background;default:''"`
 	Status     *int8      `json:"status" gorm:"column:status;not null;default:0"`
 	Open       *int8      `json:"open" gorm:"column:open;not null;default:0"`
+	FlowNo     string     `json:"flowNo" gorm:"column:flow_no;default:''"`
+	Remark     string     `json:"remark" gorm:"column:remark;default:''"`
 	IsDelete   *int8      `json:"isDelete" gorm:"column:is_delete;not null;default:0"`
 	CreatedBy  int64      `json:"createdBy,string" gorm:"column:created_by;not null;default:-1"`
 	UpdatedBy  int64      `json:"updatedBy,string" gorm:"column:updated_by;not null;default:-1"`
@@ -36,6 +46,8 @@ func (p *RoomHeader) ConvertResp() *room.RoomHeaderResponse {
 		Background: p.Background,
 		Status:     p.Status,
 		Open:       p.Open,
+		FlowNo:     p.FlowNo,
+		Remark:     p.Remark,
 		CreatedBy:  p.CreatedBy,
 		UpdatedBy:  p.UpdatedBy,
 		CreateTime: p.CreateTime.UnixMilli(),

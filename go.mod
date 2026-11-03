@@ -5,8 +5,8 @@ go 1.25.0
 require (
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cloudwego/kitex v0.16.4
-	github.com/kouleen/common v0.0.82
-	github.com/kouleen/idl v0.0.65
+	github.com/kouleen/common v0.0.89
+	github.com/kouleen/idl v0.0.72
 	gorm.io/gorm v1.31.2
 )
 
@@ -45,6 +45,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/rabbitmq/amqp091-go v1.15.0 // indirect
 	github.com/stretchr/testify v1.10.0 // indirect
 	github.com/tidwall/gjson v1.17.3 // indirect
 	github.com/tidwall/match v1.1.1 // indirect

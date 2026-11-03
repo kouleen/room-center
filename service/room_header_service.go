@@ -3,13 +3,17 @@ package service
 import (
 	"context"
 	"errors"
+	"strconv"
+	"time"
 
 	"github.com/bwmarrin/snowflake"
+	"github.com/kouleen/common/client"
 	"github.com/kouleen/common/pkg/alloc"
 	"github.com/kouleen/common/pkg/ctxutil"
 	"github.com/kouleen/idl/kitex_gen/common"
 	"github.com/kouleen/idl/kitex_gen/room"
 	"github.com/kouleen/idl/kitex_gen/rpc"
+	"github.com/kouleen/idl/kitex_gen/workflow"
 	"github.com/kouleen/room-center/modle"
 	"github.com/kouleen/room-center/repository"
 )
@@ -70,6 +74,7 @@ func CreateHeader(ctx context.Context, req *room.RoomHeaderRequest) (resp bool, 
 		RoomType:   req.RoomType,
 		RoomImage:  req.GetRoomImage(),
 		Background: req.GetBackground(),
+		Remark:     req.GetRemark(),
 		CreatedBy:  ctxutil.GetUserId(ctx),
 	}
 	if err = repository.CreateHeader(ctx, entity); err != nil {
@@ -79,6 +84,7 @@ func CreateHeader(ctx context.Context, req *room.RoomHeaderRequest) (resp bool, 
 }
 
 func UpdateHeader(ctx context.Context, req *room.RoomHeaderRequest) (resp bool, err error) {
+	now := time.Now()
 	item, err := repository.QueryHeaderById(ctx, req.GetId())
 	if err != nil {
 		return
@@ -89,7 +95,41 @@ func UpdateHeader(ctx context.Context, req *room.RoomHeaderRequest) (resp bool, 
 	item.Background = req.GetBackground()
 	item.Status = req.Status
 	item.Open = req.Open
+	item.Remark = req.GetRemark()
 	item.UpdatedBy = ctxutil.GetUserId(ctx)
+	item.UpdateTime = &now
+	if err = repository.UpdateHeader(ctx, item); err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func CommitHeader(ctx context.Context, req *room.RoomHeaderRequest) (resp bool, err error) {
+	now := time.Now()
+	item, err := repository.QueryHeaderById(ctx, req.GetId())
+	if err != nil {
+		return
+	}
+	process, err := client.GetWorkflowRpc(ctx).SaveWorkflowProcess(ctx, &workflow.WorkflowProcessRequest{
+		Module:   rpc.ROOM_RPC_SERVER,
+		Business: item.TableName(),
+		TradeNo:  strconv.FormatInt(item.ID, 10),
+		Remark:   req.GetRemark(),
+	})
+	if err != nil {
+		return
+	}
+	item.FlowNo = process.FlowNo
+	item.RoomName = req.GetRoomName()
+	item.RoomType = req.RoomType
+	item.RoomImage = req.GetRoomImage()
+	item.Background = req.GetBackground()
+	status := req.GetStatus() + 1
+	item.Status = &status
+	item.Open = req.Open
+	item.Remark = req.GetRemark()
+	item.UpdatedBy = ctxutil.GetUserId(ctx)
+	item.UpdateTime = &now
 	if err = repository.UpdateHeader(ctx, item); err != nil {
 		return false, err
 	}
@@ -97,21 +137,47 @@ func UpdateHeader(ctx context.Context, req *room.RoomHeaderRequest) (resp bool, 
 }
 
 func DeleteHeader(ctx context.Context, req *room.RoomHeaderRequest) (resp bool, err error) {
-	item, err := repository.QueryHeaderById(ctx, req.GetId())
+	itemList, err := repository.QueryHeaderByIdList(ctx, req.GetIdList())
 	if err != nil {
 		return
 	}
-	if common.BaseStatus_ENABLE == common.BaseStatus(*item.Status) {
-		return false, errors.New("deleting an enable room is prohibited")
+	closeStatus := modle.CLOSED
+	for _, item := range itemList {
+		// 不是待提交和驳回状态
+		if modle.PREPARE != *item.Status && modle.REJECTED != *item.Status {
+			return false, errors.New("deleting an enable room is prohibited")
+		}
+		if common.BaseStatus_ENABLE == common.BaseStatus(*item.Open) {
+			return false, errors.New("deleting an open room is prohibited")
+		}
+		item.Status = &closeStatus
+		item.UpdatedBy = ctxutil.GetUserId(ctx)
 	}
-	if common.BaseStatus_ENABLE == common.BaseStatus(*item.Open) {
-		return false, errors.New("deleting an open room is prohibited")
-	}
-	isDelete := int8(common.BaseStatus_ENABLE)
-	item.IsDelete = &isDelete
-	item.UpdatedBy = ctxutil.GetUserId(ctx)
-	if err = repository.UpdateHeader(ctx, item); err != nil {
+
+	if err = repository.BatchUpdateHeader(ctx, itemList); err != nil {
 		return false, err
 	}
 	return true, nil
+}
+
+func ReviewHeader(ctx context.Context, req *room.RoomHeaderRequest) (err error) {
+	now := time.Now()
+	item, err := repository.QueryHeaderByFlowNo(ctx, req.GetFlowNo())
+	if err != nil {
+		return
+	}
+	if item == nil {
+		return errors.New("no such flow no")
+	}
+	// 状态不是审批中
+	if *item.Status != 1 {
+		return errors.New("incorrect status")
+	}
+	item.Status = req.Status
+	item.UpdatedBy = ctxutil.GetUserId(ctx)
+	item.UpdateTime = &now
+	if err = repository.UpdateHeader(ctx, item); err != nil {
+		return err
+	}
+	return nil
 }

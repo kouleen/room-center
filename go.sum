@@ -124,10 +124,10 @@ github.com/klauspost/compress v1.17.9 h1:6KIumPrER1LHsvBVuDa0r5xaG0Es51mhhB9BQB2
 github.com/klauspost/compress v1.17.9/go.mod h1:Di0epgTjJY877eYKx5yC51cX2A2Vl2ibi7bDH9ttBbw=
 github.com/klauspost/cpuid/v2 v2.2.10 h1:tBs3QSyvjDyFTq3uoc/9xFpCuOsJQFNPiAhYdw2skhE=
 github.com/klauspost/cpuid/v2 v2.2.10/go.mod h1:hqwkgyIinND0mEev00jJYCxPNVRVXFQeu1XKlok6oO0=
-github.com/kouleen/common v0.0.82 h1:UxMxXQh60EEakDDFhs3Pd+UT/xNsRwx792uw3SjYdhM=
-github.com/kouleen/common v0.0.82/go.mod h1:NdRVMIItmFNPzI0He0gxB6t4nntmfBHCTtdI5KUoNYw=
-github.com/kouleen/idl v0.0.65 h1:Lk487xxBknD8LrtHXeHsmtMRyJPj0mQDZSOGKoxOEUI=
-github.com/kouleen/idl v0.0.65/go.mod h1:WFj1G7aYc6I1J+LgcHupKJfMjIn8GnV3oj8dU4oLtvc=
+github.com/kouleen/common v0.0.89 h1:5bR+WD37psE2G5mcOOFEx2RIeLx2TXV76zNoCpadGZM=
+github.com/kouleen/common v0.0.89/go.mod h1:vgul0j0bRx+hhjXQW6INzUNdwKmvgvAiAGw9ha4sj28=
+github.com/kouleen/idl v0.0.72 h1:0SA6mL7VRE7Yust5lYpvLcb9oMpr/j2oi4ipOrwoCzI=
+github.com/kouleen/idl v0.0.72/go.mod h1:WFj1G7aYc6I1J+LgcHupKJfMjIn8GnV3oj8dU4oLtvc=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
 github.com/kr/pretty v0.3.1 h1:flRD4NNwYAUpkphVc1HcthR4KEIFJ65n8Mw5qdRn3LE=
 github.com/kr/pretty v0.3.1/go.mod h1:hoEshYVHaxMs3cyo3Yncou5ZscifuDolrwPKZanG3xk=
@@ -156,6 +156,8 @@ github.com/prometheus/common v0.62.0 h1:xasJaQlnWAeyHdUBeGjXmutelfJHWMRr+Fg4QszZ
 github.com/prometheus/common v0.62.0/go.mod h1:vyBcEuLSvWos9B1+CyL7JZ2up+uFzXhkqml0W5zIY1I=
 github.com/prometheus/procfs v0.15.1 h1:YagwOFzUgYfKKHX6Dr+sHT7km/hxC76UB0learggepc=
 github.com/prometheus/procfs v0.15.1/go.mod h1:fB45yRUv8NstnjriLhBQLuOUt+WW4BsoGhij/e3PBqk=
+github.com/rabbitmq/amqp091-go v1.15.0 h1:LEQL4/yp48/Wigt6A6XOu18RQRo8ZHtB5I/KZJn+gkw=
+github.com/rabbitmq/amqp091-go v1.15.0/go.mod h1:Hy4jKW5kQART1u+JkDTF9YYOQUHXqMuhrgxOEeS7G4o=
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
 github.com/rogpeppe/go-internal v1.13.1 h1:KvO1DLK/DRN07sQ1LQKScxyZJuNnedQ5/wKSR38lUII=
 github.com/rogpeppe/go-internal v1.13.1/go.mod h1:uMEvuHeurkdAXX61udpOXGD/AzZDWNMNyH2VO9fmH0o=
